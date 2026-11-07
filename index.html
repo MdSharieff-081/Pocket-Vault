@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PocketVault</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--sf:#fafafa;--tx:#0a0a0a;--mu:#737373;--bd:#e5e5e5;--ac:#0a0a0a;--ac-t:#fff;--hl:#e5e5e5;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0a0a;--sf:#171717;--tx:#fff;--mu:#a3a3a3;--bd:#262626;--ac:#fff;--ac-t:#0a0a0a;--hl:#404040;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a0a0a;--sf:#171717;--tx:#fff;--mu:#a3a3a3;--bd:#262626;--ac:#fff;--ac-t:#0a0a0a;--hl:#404040;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.55 Inter,system-ui,sans-serif;transition:background .25s,color .25s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 12px;transition:transform .1s,background .15s}
+button:hover{background:var(--sf)}button:active{transform:scale(.97)}
+button.p{background:var(--ac);color:var(--ac-t);border-color:var(--ac)}button.p:hover{opacity:.88;background:var(--ac)}
+input,select,textarea{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus,button:focus-visible{border-color:var(--mu);outline:2px solid var(--hl);outline-offset:1px}
+#app{display:flex;height:100%}
+nav{width:220px;border-right:1px solid var(--bd);background:var(--sf);padding:16px 10px;display:flex;flex-direction:column;gap:2px;transition:width .25s,transform .25s;overflow:auto}
+nav h1{font-size:18px;margin:4px 10px 16px;letter-spacing:-.02em}
+nav a{display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;color:var(--mu);cursor:pointer;transition:background .15s}
+nav a:hover{background:var(--hl)}nav a.on{background:var(--ac);color:var(--ac-t)}
+main{flex:1;overflow:auto;display:flex;flex-direction:column;min-width:0}
+header{display:flex;gap:10px;padding:12px 24px;border-bottom:1px solid var(--bd);align-items:center;position:sticky;top:0;background:var(--bg);z-index:5}
+header input{max-width:460px}#menu{display:none}
+#view{padding:24px;max-width:960px;width:100%;margin:0 auto;animation:up .25s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font-size:26px;letter-spacing:-.03em;margin:0 0 4px}.mu{color:var(--mu);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{border:1px solid var(--bd);border-radius:12px;padding:14px;background:var(--bg);animation:up .25s ease;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--mu)}.card b{display:block;margin-bottom:4px;word-break:break-word}
+.card p{margin:0 0 8px;color:var(--mu);font-size:13px;max-height:60px;overflow:hidden}
+.acts{display:flex;gap:4px;flex-wrap:wrap}.acts button{padding:2px 8px;font-size:12px}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--bd);border-radius:20px;padding:0 8px;margin:0 4px 4px 0;color:var(--mu)}
+.stat{font-size:28px;font-weight:700}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.tabs button.on{background:var(--ac);color:var(--ac-t)}
+.task{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.ck{appearance:none;width:20px;height:20px;padding:0;border:1.5px solid var(--mu);border-radius:6px;flex:none;cursor:pointer;transition:all .2s;display:grid;place-items:center}
+.ck:checked{background:var(--ac);border-color:var(--ac)}.ck:checked::after{content:"";width:5px;height:10px;border:solid var(--ac-t);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px);animation:pop .2s}
+@keyframes pop{from{transform:rotate(45deg) scale(0)}}
+.done .t{text-decoration:line-through;color:var(--mu)}.t{flex:1;min-width:0;cursor:pointer}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:20;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{background:var(--bg);border:1px solid var(--bd);border-radius:14px;width:min(640px,94vw);max-height:90vh;overflow:auto;padding:18px;animation:up .25s;display:flex;flex-direction:column;gap:10px}
+#ed{min-height:240px;border:1px solid var(--bd);border-radius:8px;padding:12px;outline:none}
+#ed blockquote{border-left:3px solid var(--mu);margin:8px 0;padding-left:12px;color:var(--mu)}#ed pre{background:var(--sf);padding:8px;border-radius:6px}
+.tb{display:flex;gap:4px;flex-wrap:wrap}.tb button{padding:3px 9px;min-width:32px}
+mark{background:var(--hl);color:inherit;border-radius:3px}
+.empty{text-align:center;color:var(--mu);padding:48px 0;border:1px dashed var(--bd);border-radius:12px}
+#fab{position:fixed;right:24px;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;font-size:26px;padding:0;z-index:9}
+#cm{position:fixed;right:24px;bottom:90px;display:none;flex-direction:column;gap:4px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:6px;z-index:9;animation:up .15s}
+#cm button{border:0;text-align:left}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ac);color:var(--ac-t);padding:8px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+@media(max-width:760px){nav{position:fixed;inset:0 auto 0 0;z-index:15;transform:translateX(-100%);padding-top:calc(16px + env(safe-area-inset-top,0px))}nav.open{transform:none}#menu{display:block}header{padding:10px 14px}#view{padding:16px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="app">
+<nav id="nav"></nav>
+<main><header><button id="menu" aria-label="Menu">☰</button><input id="q" type="search" placeholder="Search notes, tasks, lists, tags…  ( / )"><span class="mu" id="st"></span></header>
+<div id="view"></div></main></div>
+<div id="cm"><button data-n="note">New note</button><button data-n="task">New task</button><button data-n="list">New list</button></div>
+<button id="fab" class="p" aria-label="Create">+</button><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const strip=h=>{const d=document.createElement('div');d.innerHTML=h||'';return d.textContent};
+let S={items:[],theme:'system',sortN:'mod',recent:[]},view='home',q='',tf='today',tagF='';
+const NAV=[['home','Home'],['note','All Notes'],['task','Tasks'],['list','Lists'],['fav','Favorites'],['arch','Archive'],['trash','Trash'],['set','Settings']];
+/* storage: IndexedDB */
+const idb=new Promise(r=>{try{const o=indexedDB.open('pocketvault',1);o.onupgradeneeded=()=>o.result.createObjectStore('kv');o.onsuccess=()=>r(o.result);o.onerror=()=>r(null)}catch(e){r(null)}});
+const status=t=>{$('#st').textContent=t};
+let tm;function save(){status('Saving…');clearTimeout(tm);tm=setTimeout(async()=>{try{const d=await idb;d.transaction('kv','readwrite').objectStore('kv').put(JSON.stringify(S),'s');status('Saved')}catch(e){status('Save failed')}},300)}
+async function load(){try{const d=await idb;return await new Promise(r=>{const g=d.transaction('kv').objectStore('kv').get('s');g.onsuccess=()=>r(g.result);g.onerror=()=>r(null)})}catch(e){return null}}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.opacity=1;clearTimeout(t.h);t.h=setTimeout(()=>t.style.opacity=0,2000)}
+function theme(){const r=document.documentElement;S.theme==='system'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',S.theme)}
+/* model */
+const live=i=>!i.del&&!i.arch;
+function mk(type){const n=Date.now(),i={id:uid(),type,title:'',body:'',tags:[],fav:false,pin:false,arch:false,del:null,created:n,mod:n};
+if(type==='task')Object.assign(i,{done:false,due:'',pri:'medium',rec:'none',subs:[]});if(type==='list')i.items=[];S.items.unshift(i);save();return i}
+const get=id=>S.items.find(i=>i.id===id);
+function upd(id,p){const i=get(id);Object.assign(i,p,{mod:Date.now()});save()}
+const today=()=>new Date().toISOString().slice(0,10);
+const dnow=t=>t.done||(t.rec!=='none'&&t.lastDone===today());
+const overdue=t=>t.type==='task'&&!t.done&&t.due&&t.due<today();
+/* views */
+function hl(s){s=esc(s);if(!q)return s;const r=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp('('+esc(r)+')','gi'),'<mark>$1</mark>')}
+function matches(i){if(tagF&&!i.tags.includes(tagF))return false;if(!q)return true;const s=q.toLowerCase();return [i.title,strip(i.body),i.tags.join(' '),(i.items||[]).map(x=>x.text).join(' '),(i.subs||[]).map(x=>x.text).join(' ')].join(' ').toLowerCase().includes(s)}
+function card(i){const sn=i.type==='list'?`${i.items.filter(x=>x.done).length}/${i.items.length} items done`:i.type==='task'?(i.due?'Due '+i.due:'No due date'):strip(i.body).slice(0,140);
+const a=i.del?`<button data-a="restore">Restore</button><button data-a="purge">Delete forever</button>`:i.arch?`<button data-a="unarch">Restore</button><button data-a="del">Trash</button>`:
+`<button data-a="fav">${i.fav?'★':'☆'}</button>${i.type==='note'?`<button data-a="pin">${i.pin?'Unpin':'Pin'}</button>`:''}${i.type==='list'?'<button data-a="dup">Duplicate</button>':''}<button data-a="arch">Archive</button><button data-a="del">Delete</button>`;
+return `<div class="card" data-id="${i.id}"><b>${i.pin?'📌 ':''}${hl(i.title||'Untitled')} <span class="mu">· ${i.type}</span></b><p>${hl(sn)}</p>${i.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}<div class="acts">${a}</div></div>`}
+const grid=a=>a.length?`<div class="grid">${a.map(card).join('')}</div>`:'<div class="empty">Nothing here yet.</div>';
+function taskRow(t){return `<div class="task ${dnow(t)?'done':''}" data-id="${t.id}"><input type="checkbox" class="ck" ${dnow(t)?'checked':''} aria-label="Complete"><div class="t"><div>${hl(t.title||'Untitled')}</div><div class="mu">${t.pri} priority${t.due?' · '+t.due:''}${t.rec!=='none'?' · repeats '+t.rec:''}${overdue(t)?' · overdue':''} ${t.tags.map(x=>'#'+esc(x)).join(' ')}</div></div><button data-a="fav">${t.fav?'★':'☆'}</button><button data-a="arch">Archive</button><button data-a="del">Delete</button></div>`}
+const head=(t,s)=>`<h2>${t}</h2><div class="mu">${s||''}</div>`;
+function render(){
+$('#nav').innerHTML='<h1>🔒 PocketVault</h1>'+NAV.map(([k,l])=>{const n=k==='trash'?S.items.filter(i=>i.del).length:'';return `<a data-v="${k}" class="${view===k&&!q?'on':''}">${l}<span>${n||''}</span></a>`}).join('');
+const V=$('#view'),L=S.items.filter(live),h=[];
+if(q){const r=S.items.filter(i=>!i.del&&matches(i));V.innerHTML=head('Search results',r.length+' matches for “'+esc(q)+'”')+(r.length?grid(r):`<div class="empty">No results. Try a tag, a task name, or a list item.</div><div class="row">${S.recent.map(x=>`<button data-rs="${esc(x)}">${esc(x)}</button>`).join('')}</div>`);return}
+const tags=[...new Set(S.items.filter(i=>!i.del).flatMap(i=>i.tags))];
+const tagBar=tags.length?`<div class="row">${tags.map(t=>`<button class="tag ${tagF===t?'p':''}" data-tag="${esc(t)}" style="${tagF===t?'background:var(--ac);color:var(--ac-t)':''}">#${esc(t)}</button>`).join('')}${tagF?'<button data-tag="">Clear</button>':''}</div>`:'';
+if(view==='home'){const T=L.filter(i=>i.type==='task'),g=new Date().getHours();
+const rec=[...L].filter(i=>i.type==='note').sort((a,b)=>b.mod-a.mod).slice(0,4),pin=L.filter(i=>i.pin),rem=T.filter(t=>!dnow(t)&&t.due&&t.due>=today()).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,4),ls=L.filter(i=>i.type==='list').sort((a,b)=>b.mod-a.mod).slice(0,4);
+V.innerHTML=head((g<12?'Good morning':g<18?'Good afternoon':'Good evening'),new Date().toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'}))+
+`<div class="row"><button class="p" data-n="note">New note</button><button data-n="task">New task</button><button data-n="list">New list</button><button data-n="file">Attach file…</button></div>
+<div class="grid"><div class="card"><div class="stat">${T.filter(t=>!dnow(t)).length}</div><span class="mu">Pending</span></div><div class="card"><div class="stat">${T.filter(dnow).length}</div><span class="mu">Completed</span></div><div class="card"><div class="stat">${T.filter(overdue).length}</div><span class="mu">Overdue</span></div></div>
+<h3>Pinned</h3>${grid(pin)}<h3>Recently edited</h3>${grid(rec)}<h3>Upcoming reminders</h3>${rem.length?rem.map(taskRow).join(''):'<div class="mu">No upcoming due dates.</div>'}<h3>Recent lists</h3>${grid(ls)}`}
+else if(view==='note'){const s=S.sortN;const r=L.filter(i=>i.type==='note'&&matches(i)).sort((a,b)=>b.pin-a.pin||(s==='title'?a.title.localeCompare(b.title):b[s]-a[s]));
+V.innerHTML=head('All Notes',r.length+' notes')+`<div class="row"><select id="sort" style="width:auto"><option value="mod">Modified</option><option value="created">Created</option><option value="title">Title</option></select></div>${tagBar}${grid(r)}`;$('#sort').value=s}
+else if(view==='task'){const T=L.filter(i=>i.type==='task'&&matches(i));const f={today:t=>!dnow(t)&&t.due===today(),upcoming:t=>!dnow(t)&&t.due>today(),overdue,done:dnow,all:()=>1}[tf];
+const r=T.filter(f).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')||['high','medium','low'].indexOf(a.pri)-['high','medium','low'].indexOf(b.pri));
+V.innerHTML=head('Tasks',T.filter(t=>!dnow(t)).length+' pending')+`<div class="row"><input id="nt" placeholder="Add a task and press Enter…"></div><div class="row tabs">${['today','upcoming','overdue','done','all'].map(k=>`<button data-tf="${k}" class="${tf===k?'on':''}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>${tagBar}${r.length?r.map(taskRow).join(''):'<div class="empty">No tasks in this view.</div>'}`}
+else if(view==='list'){V.innerHTML=head('Lists')+`<div class="row"><input id="nl" placeholder="New list name, press Enter…"></div>${grid(L.filter(i=>i.type==='list'&&matches(i)))}`}
+else if(view==='fav'){V.innerHTML=head('Favorites')+grid(L.filter(i=>i.fav))}
+else if(view==='arch'){V.innerHTML=head('Archive','Archived items are kept safely.')+grid(S.items.filter(i=>i.arch&&!i.del))}
+else if(view==='trash'){const r=S.items.filter(i=>i.del);V.innerHTML=head('Trash','Deleted items can be restored.')+(r.length?'<div class="row"><button data-a="empty">Empty trash</button></div>':'')+(r.length?`<div class="grid">${r.map(i=>card(i).replace('</b>',` <span class="mu">deleted ${new Date(i.del).toLocaleDateString()}</span></b>`)).join('')}</div>`:'<div class="empty">Trash is empty.</div>')}
+else{const sz=new Blob([JSON.stringify(S)]).size;V.innerHTML=head('Settings')+`<h3>Appearance</h3><select id="th" style="width:auto"><option value="system">Follow system</option><option value="light">Light</option><option value="dark">Dark</option></select>
+<h3>Backup</h3><div class="row"><button data-a="export">Export JSON</button><button data-a="import">Import JSON</button><input type="file" id="imp" accept=".json" hidden></div>
+<h3>Storage</h3><div class="mu">${S.items.length} records · ${(sz/1024).toFixed(1)} KB used</div><h3>Danger zone</h3><button data-a="clear">Clear all data</button>`;$('#th').value=S.theme}}
+/* editor modal */
+function modal(html){const o=document.createElement('div');o.className='ov';o.innerHTML='<div class="modal">'+html+'</div>';o.onclick=e=>{if(e.target===o)closeM()};document.body.appendChild(o);return o}
+function closeM(){document.querySelectorAll('.ov').forEach(o=>o.remove());render()}
+function confirmD(msg,fn){const o=modal(`<b>${msg}</b><div class="row"><button class="p" id="y">Confirm</button><button id="no">Cancel</button></div>`);o.style.zIndex=40;o.querySelector('#y').onclick=()=>{o.remove();fn()};o.querySelector('#no').onclick=()=>o.remove()}
+function edit(id){const i=get(id);if(!i||i.del)return;
+const f=`<div class="row" style="justify-content:space-between;margin:0"><span class="mu">${i.type} · edited ${new Date(i.mod).toLocaleString()}</span><button id="x">Done</button></div><input id="ti" placeholder="Title" value="${esc(i.title)}" style="font-size:20px;font-weight:600"><input id="tg" placeholder="Tags, comma separated" value="${esc(i.tags.join(', '))}">`;
+let b='';
+if(i.type==='note')b=`<div class="tb">${[['h1','H1'],['h2','H2'],['h3','H3'],['bold','B'],['italic','I'],['underline','U'],['ul','•'],['ol','1.'],['quote','❝'],['code','</>'],['link','🔗'],['check','☐']].map(([c,l])=>`<button data-c="${c}">${l}</button>`).join('')}</div><div id="ed" contenteditable="true">${i.body}</div><div class="row"><button data-a="txt">TXT</button><button data-a="md">Markdown</button><button data-a="pdf">PDF (print)</button><button data-a="att">Attach file</button></div><div id="at"></div>`;
+if(i.type==='task')b=`<textarea id="ds" rows="3" placeholder="Description">${esc(i.body)}</textarea><div class="row"><label>Due <input id="du" type="date" value="${i.due}"></label><label>Priority <select id="pr"><option>high</option><option>medium</option><option>low</option></select></label><label>Repeat <select id="rc"><option>none</option><option>daily</option><option>weekly</option><option>monthly</option></select></label></div><b>Subtasks</b><div id="sb"></div><input id="ns" placeholder="Add subtask, Enter">`;
+if(i.type==='list')b=`<input id="ni" placeholder="Add item (optionally Category: item), Enter"><div id="it"></div>`;
+const o=modal(f+b),$$=s=>o.querySelector(s);
+$$('#x').onclick=closeM;$$('#ti').oninput=e=>upd(id,{title:e.target.value});$$('#tg').onchange=e=>upd(id,{tags:e.target.value.split(',').map(s=>s.trim()).filter(Boolean)});
+if(i.type==='note'){const ed=$$('#ed');ed.oninput=()=>upd(id,{body:ed.innerHTML});const bl={h1:'H1',h2:'H2',h3:'H3',quote:'BLOCKQUOTE',code:'PRE'};
+o.querySelector('.tb').onclick=e=>{const c=e.target.dataset.c;if(!c)return;ed.focus();if(bl[c])document.execCommand('formatBlock',false,bl[c]);else if(c==='ul')document.execCommand('insertUnorderedList');else if(c==='ol')document.execCommand('insertOrderedList');else if(c==='link'){const u=prompt('URL');if(u)document.execCommand('createLink',false,u)}else if(c==='check')document.execCommand('insertText',false,'☐ ');else document.execCommand(c);upd(id,{body:ed.innerHTML})};
+const at=()=>{$$('#at').innerHTML=(i.atts||[]).map((a,n)=>`<div class="row">${a.type.startsWith('image/')?`<img src="${a.data}" height="48" alt="">`:''}<span>${esc(a.name)} <span class="mu">${(a.size/1024).toFixed(1)} KB</span></span><a href="${a.data}" download="${esc(a.name)}"><button>Download</button></a><button data-rm="${n}">Remove</button></div>`).join('')};at();
+$$('#at').onclick=e=>{const n=e.target.dataset.rm;if(n!=null){i.atts.splice(n,1);upd(id,{atts:i.atts});at()}};
+$$('[data-a=att]').onclick=()=>pick(f=>{i.atts=(i.atts||[]).concat(f);upd(id,{atts:i.atts});at()});
+o.querySelector('[data-a=txt]').onclick=()=>dl(i.title+'.txt',i.title+'\n\n'+ed.innerText,'text/plain');
+o.querySelector('[data-a=md]').onclick=()=>dl(i.title+'.md','# '+i.title+'\n\n'+toMd(ed),'text/markdown');
+o.querySelector('[data-a=pdf]').onclick=()=>{const w=open('');if(!w)return toast('Allow pop-ups to print');w.document.write('<title>'+esc(i.title)+'</title><body style="font-family:sans-serif"><h1>'+esc(i.title)+'</h1>'+ed.innerHTML);w.document.close();w.print()}}
+if(i.type==='task'){$$('#pr').value=i.pri;$$('#rc').value=i.rec;$$('#ds').oninput=e=>upd(id,{body:e.target.value});$$('#du').onchange=e=>upd(id,{due:e.target.value});$$('#pr').onchange=e=>upd(id,{pri:e.target.value});$$('#rc').onchange=e=>upd(id,{rec:e.target.value});
+const sb=()=>{$$('#sb').innerHTML=i.subs.map((s,n)=>`<div class="row"><input type="checkbox" class="ck" data-n="${n}" ${s.done?'checked':''}><span>${esc(s.text)}</span><button data-rm="${n}">×</button></div>`).join('')};sb();
+$$('#sb').onclick=e=>{const n=e.target.dataset.n??e.target.dataset.rm;if(n==null)return;e.target.dataset.rm!=null?i.subs.splice(n,1):i.subs[n].done=!i.subs[n].done;upd(id,{subs:i.subs});sb()};
+$$('#ns').onkeydown=e=>{if(e.key==='Enter'&&e.target.value.trim()){i.subs.push({text:e.target.value.trim(),done:false});upd(id,{subs:i.subs});e.target.value='';sb()}}}
+if(i.type==='list'){const it=()=>{const cats=[...new Set(i.items.map(x=>x.cat||''))];$$('#it').innerHTML=`<div class="mu">${i.items.filter(x=>x.done).length} of ${i.items.length} done</div>`+cats.map(c=>(c?`<b>${esc(c)}</b>`:'')+i.items.map((x,n)=>({x,n})).filter(({x})=>(x.cat||'')===c).map(({x,n})=>`<div class="task ${x.done?'done':''}"><input type="checkbox" class="ck" data-n="${n}" ${x.done?'checked':''}><span class="t">${esc(x.text)}</span><button data-u="${n}">↑</button><button data-d="${n}">↓</button><button data-rm="${n}">×</button></div>`).join('')).join('')};it();
+$$('#it').onclick=e=>{const d=e.target.dataset,A=i.items;if(d.n!=null)A[d.n].done=!A[d.n].done;else if(d.rm!=null)A.splice(d.rm,1);else if(d.u!=null&&d.u>0)[A[d.u-1],A[d.u]]=[A[d.u],A[d.u-1]];else if(d.d!=null&&+d.d<A.length-1)[A[+d.d+1],A[+d.d]]=[A[+d.d],A[+d.d+1]];else return;upd(id,{items:A});it()};
+$$('#ni').onkeydown=e=>{const v=e.target.value.trim();if(e.key==='Enter'&&v){const m=v.match(/^([^:]{1,24}):\s*(.+)$/);i.items.push({text:m?m[2]:v,cat:m?m[1]:'',done:false});upd(id,{items:i.items});e.target.value='';it()}}}
+setTimeout(()=>$$('#ti').focus(),50)}
+function toMd(ed){let t='';ed.childNodes.forEach(n=>{const x=n.textContent,g=n.nodeName;t+=g==='H1'?'# '+x+'\n\n':g==='H2'?'## '+x+'\n\n':g==='H3'?'### '+x+'\n\n':g==='BLOCKQUOTE'?'> '+x+'\n\n':g==='PRE'?'```\n'+x+'\n```\n\n':g==='UL'?[...n.children].map(l=>'- '+l.textContent).join('\n')+'\n\n':g==='OL'?[...n.children].map((l,k)=>(k+1)+'. '+l.textContent).join('\n')+'\n\n':x+'\n\n'});return t}
+function dl(name,data,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();toast('Exported '+name)}
+function pick(cb){const f=document.createElement('input');f.type='file';f.multiple=true;f.onchange=async()=>{const out=[];for(const x of f.files){if(x.size>5e6){toast(x.name+' is over 5 MB');continue}out.push(await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r({name:x.name,size:x.size,type:x.type||'file',data:fr.result});fr.readAsDataURL(x)}))}if(out.length)cb(out)};f.click()}
+/* actions */
+function act(a,id){const i=id&&get(id);
+const M={fav:()=>upd(id,{fav:!i.fav}),pin:()=>upd(id,{pin:!i.pin}),arch:()=>{upd(id,{arch:true});toast('Archived')},unarch:()=>upd(id,{arch:false}),del:()=>{upd(id,{del:Date.now()});toast('Moved to Trash')},restore:()=>{upd(id,{del:null});toast('Restored')},
+purge:()=>confirmD('Permanently delete this item?',()=>{S.items=S.items.filter(x=>x.id!==id);save();render()}),
+dup:()=>{const c=JSON.parse(JSON.stringify(i));c.id=uid();c.title+=' (copy)';c.created=c.mod=Date.now();c.items.forEach(x=>x.done=false);S.items.unshift(c);save();toast('List duplicated')},
+empty:()=>confirmD('Permanently delete everything in Trash?',()=>{S.items=S.items.filter(x=>!x.del);save();render()}),
+export:()=>dl('pocketvault-backup.json',JSON.stringify(S,null,1),'application/json'),import:()=>$('#imp').click(),
+clear:()=>confirmD('Erase ALL PocketVault data? This cannot be undone.',()=>{S.items=[];S.recent=[];save();render();toast('Data cleared')})};
+if(M[a]){M[a]();if(!['purge','empty','clear','export','import'].includes(a))render()}}
+function newItem(t){if(t==='file'){const n=mk('note');n.title='Attachments';return pick(f=>{n.atts=f;save();edit(n.id)})}const i=mk(t);if(t==='list'&&view!=='list')view='list';edit(i.id)}
+document.addEventListener('click',e=>{const t=e.target;
+if(t.dataset.n&&t.closest('#cm,#view')){$('#cm').style.display='none';return newItem(t.dataset.n)}
+if(t.closest('#fab')){const c=$('#cm');c.style.display=c.style.display==='flex'?'none':'flex';return}
+$('#cm').style.display='none';
+if(t.closest('#menu'))return $('#nav').classList.toggle('open');
+const nv=t.closest('[data-v]');if(nv){view=nv.dataset.v;q='';$('#q').value='';tagF='';$('#nav').classList.remove('open');return render()}
+if(t.dataset.rs){q=t.dataset.rs;$('#q').value=q;return render()}
+if(t.dataset.tf){tf=t.dataset.tf;return render()}
+if(t.dataset.tag!=null&&t.closest('#view')){tagF=t.dataset.tag;return render()}
+if(t.dataset.a&&t.closest('#view')){const c=t.closest('[data-id]');return act(t.dataset.a,c&&c.dataset.id)}
+if(t.classList.contains('ck')&&t.closest('#view')){const k=get(t.closest('[data-id]').dataset.id);
+if(k.type==='task'&&k.rec!=='none'&&k.due){
+if(k.lastDone===today()){upd(k.id,{lastDone:'',due:k.prevDue||k.due});toast('Marked pending again')}
+else{const d=new Date(k.due+'T00:00:00'),n=today(),step=()=>{k.rec==='daily'?d.setDate(d.getDate()+1):k.rec==='weekly'?d.setDate(d.getDate()+7):d.setMonth(d.getMonth()+1)};
+let nd=k.due;if(nd<=n){do step();while(d.toLocaleDateString('en-CA')<=n);nd=d.toLocaleDateString('en-CA')}
+upd(k.id,{prevDue:k.due,lastDone:n,due:nd});toast('Done for today. Next: '+nd)}}
+else upd(k.id,{done:!k.done});return setTimeout(render,220)}
+const c=t.closest('[data-id]');if(c&&c.closest('#view'))edit(c.dataset.id)});
+document.addEventListener('change',e=>{if(e.target.id==='sort'){S.sortN=e.target.value;save();render()}
+if(e.target.id==='th'){S.theme=e.target.value;theme();save()}
+if(e.target.id==='imp'){const f=e.target.files[0];if(!f)return;f.text().then(x=>{try{const d=JSON.parse(x);if(!d||!Array.isArray(d.items)||d.items.some(i=>!i.id||!i.type||!['note','task','list'].includes(i.type)))throw 0;
+confirmD(`Import ${d.items.length} items? They will be merged with your data (matching IDs are overwritten).`,()=>{d.items.forEach(n=>{n.tags=n.tags||[];if(n.type==='list')n.items=n.items||[];if(n.type==='task')n.subs=n.subs||[];S.items=S.items.filter(o=>o.id!==n.id);S.items.push(n)});save();render();toast('Backup imported')})}catch(_){toast('Invalid backup file')}})}});
+document.addEventListener('keydown',e=>{const t=e.target;
+if(t.id==='nt'&&e.key==='Enter'&&t.value.trim()){const i=mk('task');i.title=t.value.trim();if(tf==='today')i.due=today();save();render();$('#nt').focus()}
+if(t.id==='nl'&&e.key==='Enter'&&t.value.trim()){const i=mk('list');i.title=t.value.trim();render();edit(i.id)}
+if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(t.tagName)&&!t.isContentEditable){e.preventDefault();$('#q').focus()}
+if(e.key==='Escape'&&document.querySelector('.ov'))closeM()});
+$('#q').oninput=e=>{q=e.target.value.trim();render()};
+$('#q').onchange=e=>{const v=e.target.value.trim();if(v){S.recent=[v,...S.recent.filter(x=>x!==v)].slice(0,5);save()}};
+/* offline support */
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.querySelector('.ov'))render()});
+/* boot */
+(async()=>{const d=await load();if(d)try{S=Object.assign(S,JSON.parse(d))}catch(e){}
+if(!S.items.length&&!S.seeded){S.seeded=1;const n=mk('note');n.title='Welcome to PocketVault';n.body='<p>Your notes, tasks and lists live <b>only on this device</b>. Try the + button.</p>';n.pin=true;const t=mk('task');t.title='Try completing this task';t.due=today()}
+theme();render();status('Ready')})();
+</script></body></html>
